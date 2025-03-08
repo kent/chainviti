@@ -1,66 +1,92 @@
-## Foundry
+# Chainviti
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Chainviti is a multi-tenant invitation-based membership protocol with NFT minting capabilities. It allows for the creation of applications, invitation flows, and membership management using ERC721 tokens.
 
-Foundry consists of:
+## Features
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- Create separate apps with isolated membership and invitation systems
+- Invitation-based membership model with per-app configurable invite limits
+- NFT-based membership credentials
+- Flexible administration with multi-admin support
+- Configurable token transferability (per app)
+- Individual token locking mechanism
+- Custom metadata URIs per app
 
-## Documentation
+## Installation
 
-https://book.getfoundry.sh/
+This project uses [Foundry](https://book.getfoundry.sh/) for development, testing, and deployment.
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/chainviti.git
+cd chainviti
+
+# Install dependencies
+forge install
+```
 
 ## Usage
 
-### Build
+### Compile the contract
 
-```shell
-$ forge build
+```bash
+forge build
 ```
 
-### Test
+### Run tests
 
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
+```bash
+forge test
 ```
 
 ### Deploy
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```bash
+forge create --rpc-url <your_rpc_url> \
+  --constructor-args \
+  --private-key <your_private_key> \
+  src/Chainviti.sol:Chainviti
 ```
 
-### Cast
+## Contract Architecture
 
-```shell
-$ cast <subcommand>
+Chainviti uses the ERC721 standard for NFT tokens and implements several OpenZeppelin extensions:
+
+- `ERC721Upgradeable`: Base NFT functionality
+- `ERC721EnumerableUpgradeable`: Enumeration of NFTs
+- `OwnableUpgradeable`: Basic access control
+- `UUPSUpgradeable`: Upgradeable contract pattern
+
+## Basic Operations
+
+### Creating an App
+
+```solidity
+// Creates a new app with specified initial invites and invites per new user
+function createApp(bytes32 appId, uint256 initialInvites, uint256 invitesPerNewUser) external;
 ```
 
-### Help
+### Sending Invitations
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+```solidity
+// Sends an invitation to a new user
+function invite(bytes32 appId, address newUserAddress) external;
 ```
+
+### Accepting Invitations
+
+```solidity
+// Accepts an invitation, mints an NFT for the user
+function acceptInvite(bytes32 appId) external;
+```
+
+### Checking Access
+
+```solidity
+// Checks if a user has access to an app
+function hasAccess(bytes32 appId, address user) public view returns (bool);
+```
+
+## License
+
+This project is licensed under the MIT License.
